@@ -18,7 +18,8 @@
 #include <iomanip>
 #include <fstream>
 #include <cstdlib>
-#include <string>
+#include <ctime>
+#include <chrono>
 
 using namespace std;
 
@@ -28,13 +29,13 @@ using namespace std;
 void getFileName(char fileName[])
 {
    ifstream fin;
-   do
-   {
-      cout << "Where is your board located? ";
-      cin.getline(fileName, 256);
-      fin.open(fileName);
-   } while (fin.fail());
-   fin.close();
+      do
+      {
+         cout << "Where is your board located? ";
+         cin.getline(fileName, 256);
+         fin.open(fileName);
+      } while (fin.fail());
+      fin.close();
 }
 
 /************************************************************************
@@ -188,35 +189,35 @@ void showValues(char board[][9])
    cin.getline(change, 256);
 
    column = determineColumnEquivelent(change);
-
+   
    if (!(column >= 1 && column <= 9) ||
        !(change[1] >= '1' && change[1] <= '9'))
       cout << "ERROR: Square '" << change << "' is invalid" << endl;
    else
    {
       cout << "The possible values for '" << change << "' are: ";
-                findValues(board, values, change);
-                for (int l = 0; l < 9; l++)
-                {
-                        bool check = false;
-                        while (values[l] != ' ' && l < 9)
-                        {
-                                check = true;
-                                cout << values[l];
-                                for (int m = l + 1; m < 9; m++)
-                                        if (values[m] != ' ')
-                                        {
-                                                cout << ", ";
-                                                m = 9;
-                                        }
-                                l++;
-                        }
-                        if (check)
-                                l--;
-                }
-
-                cout << endl;
-        }
+      findValues(board, values, change);
+      for (int l = 0; l < 9; l++)
+      {
+         bool check = false;
+         while (values[l] != ' ' && l < 9)
+         {
+            check = true;
+            cout << values[l];
+            for (int m = l + 1; m < 9; m++)
+               if (values[m] != ' ')
+               {
+                  cout << ", ";
+                  m = 9;
+               }
+            l++;
+         }
+         if (check)
+            l--;
+      }
+      
+      cout << endl;
+   }
 }
 
 /************************************************************************
@@ -231,7 +232,7 @@ bool solveRow(char board[][9])
       for (int i = 0; i < 9; i++)
          for (int j = 0; j < 9; j++)
             values[i][j] = i + 49;
-
+      
       for (int c = 0; c < 9; c++)
       {
          if (board[r][c] != '0')
@@ -248,7 +249,7 @@ bool solveRow(char board[][9])
                values[i][c] = tempValues[i];
          }
       }
-
+      
       for (int c = 0; c < 9; c++)
       {
          int numPossible = 0;
@@ -348,95 +349,22 @@ bool solveColumn(char board[][9])
       return false;
 }
 
-void solveBoard(char board[][9])
-{
-   int tempr;
-   int tempc;
-   char values[9];
-   
-   for (int r = 0; r < 9; r++)
-   {
-      for (int c = 0; c < 9; c++)
-      {
-         int totalValues = 0;
-         if (board[r][c] == '0')
-         {
-            char change[256];
-            change[0] = c + 65;
-            change[1] = r + 49;
-            findValues(board, values, change);
-            for (int k = 0; k < 9; k++)
-            {
-               if (values[k] != ' ')
-                  totalValues += 1;
-               if (totalValues == 1)
-               {
-                  tempr = r;
-                  tempc = c;
-               }
-            }
-         }
-         if (totalValues == 1)
-         {
-            for (int k = 0; k < 9; k++)
-               if (values[k] != ' ')
-                  board[tempr][tempc] = values[k];
-         }
-      }
-   }
-
-   bool changed = true;
-   while (changed)
-   {
-      changed = solveRow(board);
-      changed = solveColumn(board);
-   }
-}
-
 /************************************************************************
 * Checks the board to see if every square is filled or not.
 ***********************************************************************/
 bool checkBoard(char board[][9])
 {
-        int numOfOpen = 0;
-
-        for (int r = 0; r < 9; r++)
-                for (int c = 0; c < 9; c++)
-                        if (board[r][c] == '0')
-                                numOfOpen += 1;
-
-        if (numOfOpen == 0)
-                return false;
-        else
-           return true;
-}
-
-bool hardCheck(char board[][9])
-{
-   char values[9];
+   int numOfOpen = 0;
+   
    for (int r = 0; r < 9; r++)
-   {
       for (int c = 0; c < 9; c++)
-      {
          if (board[r][c] == '0')
-         {
-            int numValues = 9;
-            char change[256];
-            change[0] = c + 65;
-            change[1] = r + 49;
-            findValues(board, values, change);
-            for (int k = 0; k < 9; k++)
-               if (values[k] == ' ')
-                  numValues -= 1;
-            if (numValues == 1)
-               return false;
-            else if (numValues == 0)
-               return true;
-         }
-      }
-   }
-
-   return true;
+            numOfOpen += 1;
+   
+   if (numOfOpen == 0)
+      return false;
+   else
+      return true;
 }
 
 bool possibleCheck(char board[][9])
@@ -461,7 +389,7 @@ bool possibleCheck(char board[][9])
          }
       }
    }
-
+   
    for (int r = 0; r < 9; r++)
       for (int c = 0; c < 9; c++)
          if (board[r][c] != '0')
@@ -469,7 +397,7 @@ bool possibleCheck(char board[][9])
                if (c != c2)
                   if (board[r][c] == board[r][c2])
                      return false;
-
+   
    for (int c = 0; c < 9; c++)
       for (int r = 0; r < 9; r++)
          if (board[r][c] != '0')
@@ -477,7 +405,7 @@ bool possibleCheck(char board[][9])
                if (r != r2)
                   if (board[r][c] == board[r2][c])
                      return false;
-
+   
    int row = 0;
    int column = 0;
    while (row < 9)
@@ -496,7 +424,7 @@ bool possibleCheck(char board[][9])
       }
       row += 3;
    }
-
+   
    return true;
 }
 
@@ -511,12 +439,25 @@ void guessAndCheck(char board[][9])
 {
    bool solved;
    bool possible;
-   bool hard;
-   bool changed;
+   bool changed1;
+   bool changed2;
    char values[9];
    char tempBoard[9][9];
    createTempBoard(board, tempBoard);
 
+   changed1 = true;
+   changed2 = true;
+   possible = possibleCheck(tempBoard);
+   solved = !checkBoard(tempBoard);
+   
+   while ((changed1 || changed2) && possible && !solved)
+   {
+      changed1 = solveRow(tempBoard);
+      changed2 = solveColumn(tempBoard);
+      possible = possibleCheck(tempBoard);
+      solved = !checkBoard(tempBoard);
+   }
+   
    if (possibleCheck(tempBoard) && checkBoard(tempBoard))
    {
       for (int r = 0; r < 9; r++)
@@ -529,21 +470,7 @@ void guessAndCheck(char board[][9])
                change[0] = c + 65;
                change[1] = r + 49;
                findValues(tempBoard, values, change);
-
-               hard = hardCheck(tempBoard);
-               changed = true;
-               possible = possibleCheck(tempBoard);
-               solved = !checkBoard(tempBoard);
-               while ((changed || !hard) && possible && !solved)
-               {
-                  changed = solveRow(tempBoard);
-                  changed = solveColumn(tempBoard);
-//                  solveBoard(tempBoard);
-                  hard = hardCheck(tempBoard);
-                  possible = possibleCheck(tempBoard);
-                  solved = !checkBoard(tempBoard);
-               }
-
+               
                if (possible)
                {
                   int k;
@@ -551,9 +478,6 @@ void guessAndCheck(char board[][9])
                   {
                      if (values[k] != ' ')
                      {
-#ifdef DEBUG
-                        displayBoard(tempBoard);
-#endif
                         tempBoard[r][c] = values[k];
                         solved = !checkBoard(tempBoard);
                         possible = possibleCheck(tempBoard);
@@ -576,6 +500,11 @@ void guessAndCheck(char board[][9])
             }
          }
       }
+   }
+   if (solved && possible)
+   {
+      createTempBoard(tempBoard, board);
+      return;
    }
 }
 
@@ -628,7 +557,6 @@ void chooseOption(char board[][9])
    char change[256];
    char option[256];
    bool solved;
-   bool hard;
 
    displayOptions();
    cout << endl;
@@ -662,18 +590,12 @@ void chooseOption(char board[][9])
          editBoard(board);
       else if (option[0] == 'S' && option[1] == 'o')
       {
-         solved = !checkBoard(board);
-         hard = hardCheck(board);
-
-         while (!solved && !hard)
-         {
-            solveBoard(board);
-            solved = !checkBoard(board);
-            hard = hardCheck(board);
-         }
-
+         auto start = chrono::steady_clock::now();
          guessAndCheck(board);
-         solved = !checkBoard(board);
+         auto end = chrono::steady_clock::now();
+         displayBoard(board);
+         auto elapsed = chrono::duration_cast<chrono::microseconds>(end-start);
+         cout << "It took me " << elapsed.count() << " microseconds." << endl;
       }
       else if (option[0] == 'S')
          showValues(board);
@@ -691,7 +613,7 @@ int main()
 {
    char fileName[256];
    char board[9][9];
-
+   
    do
    {
       getFileName(fileName);
