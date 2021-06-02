@@ -263,6 +263,21 @@ bool solveRow(char board[][9])
                   changed = true;
                }
       }
+      for (int c = 0; c < 9; c++)
+      {
+         int numPossible = 0;
+         for (int i = 0; i < 9; i++)
+            if (values[i][c] != ' ')
+               numPossible += 1;
+         if (numPossible == 1)
+            for (int i = 0; i < 9; i++)
+               if (values[i][c] != ' ')
+               {
+                  board[r][c] = values[i][c];
+                  changed = true;
+               }
+      }
+      
    }
    if (changed)
       return true;
@@ -308,6 +323,21 @@ bool solveColumn(char board[][9])
                if (values[r][i] != ' ')
                {
                   board[i][c] = values[r][i];
+                  changed = true;
+               }
+      }
+      
+      for (int r = 0; r < 9; r++)
+      {
+         int numPossible = 0;
+         for (int i = 0; i < 9; i++)
+            if (values[i][r] != ' ')
+               numPossible += 1;
+         if (numPossible == 1)
+            for (int i = 0; i < 9; i++)
+               if (values[i][r] != ' ')
+               {
+                  board[r][c] = values[i][r];
                   changed = true;
                }
       }
@@ -482,6 +512,7 @@ void guessAndCheck(char board[][9])
    bool solved;
    bool possible;
    bool hard;
+   bool changed;
    char values[9];
    char tempBoard[9][9];
    createTempBoard(board, tempBoard);
@@ -500,11 +531,14 @@ void guessAndCheck(char board[][9])
                findValues(tempBoard, values, change);
 
                hard = hardCheck(tempBoard);
+               changed = true;
                possible = possibleCheck(tempBoard);
                solved = !checkBoard(tempBoard);
-               while (!hard && possible && !solved)
+               while ((changed || !hard) && possible && !solved)
                {
-                  solveBoard(tempBoard);
+                  changed = solveRow(tempBoard);
+                  changed = solveColumn(tempBoard);
+//                  solveBoard(tempBoard);
                   hard = hardCheck(tempBoard);
                   possible = possibleCheck(tempBoard);
                   solved = !checkBoard(tempBoard);
