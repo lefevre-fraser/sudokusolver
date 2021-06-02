@@ -98,6 +98,7 @@ void findValues(char board[][9], char values[], char change[])
 {
    int c = determineColumnEquivelent(change) - 1;
    int r = change[1] - 49;
+
    for (int i = 0; i < 9; i++)
       values[i] = i + 49;
    for (int i = 0; i < 9; i++)
@@ -230,44 +231,146 @@ void showValues(char board[][9])
 /************************************************************************
 * Solves the board sudoku board.
 ***********************************************************************/
-void solveBoard(char board[][9])
+bool solveRow(char board[][9])
 {
-        int tempr;
-        int tempc;
-        char values[9];
+   bool changed = false;
+   char values[9][9];
+   for (int r = 0; r < 9; r++)
+   {
+      for (int i = 0; i < 9; i++)
+         for (int j = 0; j < 9; j++)
+            values[i][j] = i + 49;
 
-        for (int r = 0; r < 9; r++)
-        {
-                for (int c = 0; c < 9; c++)
-                {
-                        int totalValues = 0;
-                        if (board[r][c] == '0')
-                        {
-                                char change[256];
-                                change[0] = c + 65;
-                                change[1] = r + 49;
-                                findValues(board, values, change);
-                                for (int k = 0; k < 9; k++)
-                                {
-                                        if (values[k] != ' ')
-                                                totalValues += 1;
-                                        if (totalValues == 1)
-                                        {
-                                                tempr = r;
-                                                tempc = c;
-                                        }
-                                }
-                        }
-                        if (totalValues == 1)
-                        {
-                                for (int k = 0; k < 9; k++)
-                                        if (values[k] != ' ')
-                                                board[tempr][tempc] = values[k];
-                        }
-                }
-        }
+      for (int c = 0; c < 9; c++)
+      {
+         if (board[r][c] != '0')
+            for (int i = 0; i < 9; i++)
+               values[i][c] = ' ';
+         else
+         {
+            char change[256];
+            char tempValues[9];
+            change[0] = c + 65;
+            change[1] = r + 49;
+            findValues(board, tempValues, change);
+            for (int i = 0; i < 9; i++)
+               values[i][c] = tempValues[i];
+         }
+      }
+
+      for (int c = 0; c < 9; c++)
+      {
+         int numPossible = 0;
+         for (int i = 0; i < 9; i++)
+            if (values[c][i] != ' ')
+               numPossible += 1;
+         if (numPossible == 1)
+            for (int i = 0; i < 9; i++)
+               if (values[c][i] != ' ')
+               {
+                  board[r][i] = values[c][i];
+                  changed = true;
+               }
+      }
+   }
+   if (changed)
+      return true;
+   else
+      return false;
 }
 
+bool solveColumn(char board[][9])
+{
+   bool changed = false;
+   char values[9][9];
+   for (int c = 0; c < 9; c++)
+   {
+      for (int i = 0; i < 9; i++)
+         for (int j = 0; j < 9; j++)
+            values[i][j] = i + 49;
+
+      for (int r = 0; r < 9; r++)
+      {
+         if (board[r][c] != '0')
+            for (int i = 0; i < 9; i++)
+               values[i][r] = ' ';
+         else
+         {
+            char change[256];
+            char tempValues[9];
+            change[0] = c + 65;
+            change[1] = r + 49;
+            findValues(board, tempValues, change);
+            for (int i = 0; i < 9; i++)
+               values[i][r] = tempValues[i];
+         }
+      }
+
+      for (int r = 0; r < 9; r++)
+      {
+         int numPossible = 0;
+         for (int i = 0; i < 9; i++)
+            if (values[r][i] != ' ')
+               numPossible += 1;
+         if (numPossible == 1)
+            for (int i = 0; i < 9; i++)
+               if (values[r][i] != ' ')
+               {
+                  board[i][c] = values[r][i];
+                  changed = true;
+               }
+      }
+   }
+   if (changed)
+      return true;
+   else
+      return false;
+}
+
+void solveBoard(char board[][9])
+{
+   int tempr;
+   int tempc;
+   char values[9];
+   
+   for (int r = 0; r < 9; r++)
+   {
+      for (int c = 0; c < 9; c++)
+      {
+         int totalValues = 0;
+         if (board[r][c] == '0')
+         {
+            char change[256];
+            change[0] = c + 65;
+            change[1] = r + 49;
+            findValues(board, values, change);
+            for (int k = 0; k < 9; k++)
+            {
+               if (values[k] != ' ')
+                  totalValues += 1;
+               if (totalValues == 1)
+               {
+                  tempr = r;
+                  tempc = c;
+               }
+            }
+         }
+         if (totalValues == 1)
+         {
+            for (int k = 0; k < 9; k++)
+               if (values[k] != ' ')
+                  board[tempr][tempc] = values[k];
+         }
+      }
+   }
+
+   bool changed = true;
+   while (changed)
+   {
+      changed = solveRow(board);
+      changed = solveColumn(board);
+   }
+}
 /************************************************************************
 * Checks the board to see if every square is filled or not.
 ***********************************************************************/
@@ -413,6 +516,7 @@ void guessAndCheck(char board[][9])
                   hard = hardCheck(tempBoard);
                   possible = possibleCheck(tempBoard);
                   solved = !checkBoard(tempBoard);
+//                  solveRow(tempBoard);
                }
 
                if (possible)
@@ -422,9 +526,9 @@ void guessAndCheck(char board[][9])
                   {
                      if (values[k] != ' ')
                      {
-                        #ifdef DEBUG
+#ifdef DEBUG
                         displayBoard(tempBoard);
-                        #endif
+#endif
                         tempBoard[r][c] = values[k];
                         solved = !checkBoard(tempBoard);
                         possible = possibleCheck(tempBoard);
