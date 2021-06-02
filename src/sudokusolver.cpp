@@ -123,11 +123,8 @@ void findValues(char board[][9], char values[], char change[])
       squareSearchRow = 0;
    for (int i = squareSearchRow; i < (squareSearchRow + 3); i++)
       for (int j = squareSearchColumn; j < (squareSearchColumn + 3); j++)
-         for (int k = 0; k < 9; k++)
-            if ((board[i][j] - 48) == k + 1)
-               for (int l = 0; l < 9; l++)
-                  if ((values[l] - 48) == k + 1)
-                     values[l] = ' ';
+         if ((board[i][j] - 48) >= 1 && (board[i][j] - 48) <= 9)
+            values[board[i][j] - 49] = ' ';
 }
 
 /************************************************************************
@@ -365,6 +362,7 @@ void solveBoard(char board[][9])
       changed = solveColumn(board);
    }
 }
+
 /************************************************************************
 * Checks the board to see if every square is filled or not.
 ***********************************************************************/
@@ -510,7 +508,6 @@ void guessAndCheck(char board[][9])
                   hard = hardCheck(tempBoard);
                   possible = possibleCheck(tempBoard);
                   solved = !checkBoard(tempBoard);
-//                  solveRow(tempBoard);
                }
 
                if (possible)
@@ -532,7 +529,7 @@ void guessAndCheck(char board[][9])
                            solved = !checkBoard(tempBoard);
                            possible = possibleCheck(tempBoard);
                         }
-                        if (solved)
+                        if (solved && possible)
                         {
                            createTempBoard(tempBoard, board);
                            return;
