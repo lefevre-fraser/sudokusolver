@@ -81,7 +81,7 @@ void displayBoard(char board[][9])
 /************************************************************************
  * Converts column letter "a,b,c,d.." into a number.
  ***********************************************************************/
-int determineColumnEquivelent(char change[])
+inline int determineColumnEquivelent(char change[])
 {
    int column;
    if (!isupper(change[0]))
@@ -245,13 +245,18 @@ bool solveRow(char board[][9])
          int numPossible = 0;
          for (int i = 0; i < 9; i++)
             if (values[i][c] != ' ')
+            {
                numPossible += 1;
+               if (numPossible == 2)
+                  break;
+            }
          if (numPossible == 1)
             for (int i = 0; i < 9; i++)
                if (values[i][c] != ' ')
                {
                   board[r][i] = values[i][c];
                   changed = true;
+                  break;
                }
       }
       for (int c = 0; c < 9; c++)
@@ -259,13 +264,18 @@ bool solveRow(char board[][9])
          int numPossible = 0;
          for (int i = 0; i < 9; i++)
             if (values[c][i] != ' ')
+            {
                numPossible += 1;
+               if (numPossible == 2)
+                  break;
+            }
          if (numPossible == 1)
             for (int i = 0; i < 9; i++)
                if (values[c][i] != ' ')
                {
                   board[r][c] = values[c][i];
                   changed = true;
+                  break;
                }
       }
       
@@ -301,13 +311,18 @@ bool solveColumn(char board[][9])
          int numPossible = 0;
          for (int i = 0; i < 9; i++)
             if (values[i][r] != ' ')
+            {
                numPossible += 1;
+               if (numPossible == 2)
+                  break;
+            }
          if (numPossible == 1)
             for (int i = 0; i < 9; i++)
                if (values[i][r] != ' ')
                {
                   board[i][c] = values[i][r];
                   changed = true;
+                  break;
                }
       }
       
@@ -316,13 +331,18 @@ bool solveColumn(char board[][9])
          int numPossible = 0;
          for (int i = 0; i < 9; i++)
             if (values[r][i] != ' ')
+            {
                numPossible += 1;
+               if (numPossible == 2)
+                  break;
+            }
          if (numPossible == 1)
             for (int i = 0; i < 9; i++)
                if (values[r][i] != ' ')
                {
                   board[r][c] = values[r][i];
                   changed = true;
+                  break;
                }
       }
    }
