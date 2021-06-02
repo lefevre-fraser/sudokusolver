@@ -20,8 +20,10 @@ BUILD_DIR=.\build
 EXECUTABLE=$(BUILD_DIR)\sudokusolver.exe
 TAR_SOURCE=$(BUILD_DIR)\source.zip
 
+FLAGS=-static
+
 $(EXECUTABLE): $(SRC_DIR)\sudokusolver.cpp
-	g++ -static -o "$(EXECUTABLE)" "$(SRC_DIR)\sudokusolver.cpp"
+	g++ $(FLAGS) -o "$(EXECUTABLE)" "$(SRC_DIR)\sudokusolver.cpp"
 
 tar-source: 
 	tar -cf "$(TAR_SOURCE)" "$(SRC_DIR)\sudokusolver.cpp" "$(BOARD_DIR)\*"
