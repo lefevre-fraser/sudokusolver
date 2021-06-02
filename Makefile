@@ -14,22 +14,32 @@
 #    limitations under the License.
 #######################################################################
 
-SRC_DIR = .\src
-BOARD_DIR=.\resources
-BUILD_DIR=.\build
-EXECUTABLE=$(BUILD_DIR)\sudokusolver.exe
-TAR_SOURCE=$(BUILD_DIR)\source.zip
+include include/osvars.mk
+
+SRC_DIR = ./src/
+BOARD_DIR=./resources/
+BUILD_DIR=./build/
+INCLUDE_DIR=./include/
+EXECUTABLE=$(BUILD_DIR)sudokusolver$(F_EXT)
+TAR_SOURCE=$(BUILD_DIR)source.zip
+
+SRCS=$(wildcard $(SRC_DIR)*.cpp)
+BOARDS=$(wildcard $(BOARD_DIR)*.txt)
+INCLUDE=$(wildcard $(INCLUDE_DIR)*.mk)
 
 FLAGS=-static
+ifneq ($(OS), Windows_NT)
+	FLAGS += -std=c++11
+endif
 
-$(EXECUTABLE): $(SRC_DIR)\sudokusolver.cpp
-	g++ $(FLAGS) -o "$(EXECUTABLE)" "$(SRC_DIR)\sudokusolver.cpp"
+$(EXECUTABLE): $(SRCS)
+	g++ $(FLAGS) -o $(EXECUTABLE) $(SRCS)
 
 tar-source: 
-	tar -cf "$(TAR_SOURCE)" "$(SRC_DIR)\sudokusolver.cpp" "$(BOARD_DIR)\*"
+	tar -zcf $(TAR_SOURCE) $(SRCS) $(BOARDS) $(INCLUDE) Makefile
 
 clean:
-	DEL /Q  $(EXECUTABLE)
+	$(RM) $(subst /,$(F_SEP), $(EXECUTABLE)) $(subst /,$(F_SEP), $(TAR_SOURCE))
 
 run: $(EXECUTABLE)
-	$(EXECUTABLE)
+	$(subst /,$(F_SEP), $(EXECUTABLE))
