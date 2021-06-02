@@ -102,17 +102,11 @@ void findValues(char board[][9], char values[], char change[])
    for (int i = 0; i < 9; i++)
       values[i] = i + 49;
    for (int i = 0; i < 9; i++)
-      for (int j = 0; j < 9; j++)
-         if ((board[i][c] - 48) == j + 1)
-            for (int k = 0; k < 9; k++)
-               if ((values[k] - 48) == j + 1)
-                  values[k] = ' ';
+      if ((board[i][c] - 48) >= 1 && (board[i][c] - 48) <= 9)
+         values[board[i][c] - 49] = ' ';
    for (int i = 0; i < 9; i++)
-      for (int j = 0; j < 9; j++)
-         if ((board[r][i] - 48) == j + 1)
-            for (int k = 0; k < 9; k++)
-               if ((values[k] - 48) == j + 1)
-                  values[k] = ' ';
+      if ((board[r][i] - 48) >= 1 && (board[r][i] - 48) <= 9)
+         values[board[r][i] - 49] = ' ';
    int squareSearchColumn;
    if (c > 5)
       squareSearchColumn = 6;
