@@ -18,7 +18,6 @@
 #include <iomanip>
 #include <fstream>
 #include <cstdlib>
-#include <ctime>
 #include <chrono>
 
 using namespace std;
@@ -29,13 +28,13 @@ using namespace std;
 void getFileName(char fileName[])
 {
    ifstream fin;
-      do
-      {
-         cout << "Where is your board located? ";
-         cin.getline(fileName, 256);
-         fin.open(fileName);
-      } while (fin.fail());
-      fin.close();
+   do
+   {
+      cout << "Where is your board located? ";
+      cin.getline(fileName, 256);
+      fin.open(fileName);
+   } while (fin.fail());
+   fin.close();
 }
 
 /************************************************************************
@@ -88,7 +87,7 @@ int determineColumnEquivelent(char change[])
    if (!isupper(change[0]))
       change[0] = toupper(change[0]);
    column = change[0] - 64;
-
+   
    return column;
 }
 
@@ -135,15 +134,13 @@ void editBoard(char board[][9])
 {
    char change[256];
    char valueCheck[256];
-   bool displayValues = false;
    char values[9];
-   int column = 78;
-   change[1] = '0';
-
+   int column;
+   
    cin.ignore();
    cout << "What are the coordinates of the square: ";
    cin.getline(change, 256);
-
+   
    column = determineColumnEquivelent(change);
 
    if (!(column >= 1 && column <= 9) ||
@@ -229,41 +226,20 @@ bool solveRow(char board[][9])
    char values[9][9];
    for (int r = 0; r < 9; r++)
    {
-      for (int i = 0; i < 9; i++)
-         for (int j = 0; j < 9; j++)
-            values[i][j] = i + 49;
-      
       for (int c = 0; c < 9; c++)
       {
          if (board[r][c] != '0')
             for (int i = 0; i < 9; i++)
-               values[i][c] = ' ';
+               values[c][i] = ' ';
          else
          {
             char change[256];
-            char tempValues[9];
             change[0] = c + 65;
             change[1] = r + 49;
-            findValues(board, tempValues, change);
-            for (int i = 0; i < 9; i++)
-               values[i][c] = tempValues[i];
+            findValues(board, values[c], change);
          }
       }
       
-      for (int c = 0; c < 9; c++)
-      {
-         int numPossible = 0;
-         for (int i = 0; i < 9; i++)
-            if (values[c][i] != ' ')
-               numPossible += 1;
-         if (numPossible == 1)
-            for (int i = 0; i < 9; i++)
-               if (values[c][i] != ' ')
-               {
-                  board[r][i] = values[c][i];
-                  changed = true;
-               }
-      }
       for (int c = 0; c < 9; c++)
       {
          int numPossible = 0;
@@ -274,7 +250,21 @@ bool solveRow(char board[][9])
             for (int i = 0; i < 9; i++)
                if (values[i][c] != ' ')
                {
-                  board[r][c] = values[i][c];
+                  board[r][i] = values[i][c];
+                  changed = true;
+               }
+      }
+      for (int c = 0; c < 9; c++)
+      {
+         int numPossible = 0;
+         for (int i = 0; i < 9; i++)
+            if (values[c][i] != ' ')
+               numPossible += 1;
+         if (numPossible == 1)
+            for (int i = 0; i < 9; i++)
+               if (values[c][i] != ' ')
+               {
+                  board[r][c] = values[c][i];
                   changed = true;
                }
       }
@@ -292,42 +282,20 @@ bool solveColumn(char board[][9])
    char values[9][9];
    for (int c = 0; c < 9; c++)
    {
-      for (int i = 0; i < 9; i++)
-         for (int j = 0; j < 9; j++)
-            values[i][j] = i + 49;
-
       for (int r = 0; r < 9; r++)
       {
          if (board[r][c] != '0')
             for (int i = 0; i < 9; i++)
-               values[i][r] = ' ';
+               values[r][i] = ' ';
          else
          {
             char change[256];
-            char tempValues[9];
             change[0] = c + 65;
             change[1] = r + 49;
-            findValues(board, tempValues, change);
-            for (int i = 0; i < 9; i++)
-               values[i][r] = tempValues[i];
+            findValues(board, values[r], change);
          }
       }
 
-      for (int r = 0; r < 9; r++)
-      {
-         int numPossible = 0;
-         for (int i = 0; i < 9; i++)
-            if (values[r][i] != ' ')
-               numPossible += 1;
-         if (numPossible == 1)
-            for (int i = 0; i < 9; i++)
-               if (values[r][i] != ' ')
-               {
-                  board[i][c] = values[r][i];
-                  changed = true;
-               }
-      }
-      
       for (int r = 0; r < 9; r++)
       {
          int numPossible = 0;
@@ -338,7 +306,22 @@ bool solveColumn(char board[][9])
             for (int i = 0; i < 9; i++)
                if (values[i][r] != ' ')
                {
-                  board[r][c] = values[i][r];
+                  board[i][c] = values[i][r];
+                  changed = true;
+               }
+      }
+      
+      for (int r = 0; r < 9; r++)
+      {
+         int numPossible = 0;
+         for (int i = 0; i < 9; i++)
+            if (values[r][i] != ' ')
+               numPossible += 1;
+         if (numPossible == 1)
+            for (int i = 0; i < 9; i++)
+               if (values[r][i] != ' ')
+               {
+                  board[r][c] = values[r][i];
                   changed = true;
                }
       }
